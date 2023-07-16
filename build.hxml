@@ -1,0 +1,7 @@
+-D pong
+-cp pong
+-lib heaps
+-lib hlsdl
+-hl bin/pong.hl
+-main pong.Main
+-debug
