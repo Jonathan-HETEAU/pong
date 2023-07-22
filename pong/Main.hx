@@ -15,8 +15,8 @@ class Ball extends Object {
 		setPosition(x, y);
 		this.radius = 10;
 		this.speed = 200;
-		this.acceleration = 100;
-		this.normalSpeed = new Vec2(0.5,0.5);
+		this.acceleration = 20;
+		this.normalSpeed = new Vec2(1,0);
 
 		var g = new h2d.Graphics(this);
 		g.beginFill(0xFFFFFF);
@@ -24,6 +24,11 @@ class Ball extends Object {
 		g.beginFill(0x000000);
 		g.drawCircle(0, 0, this.radius - 2);
 		g.endFill();
+	}
+
+	public function restart() {
+		this.normalSpeed = new Vec2(1,0);
+		this.speed = 200;
 	}
 
 	public function update(dt:Float) {
@@ -72,19 +77,11 @@ class InputPad {
 	}
 
 	public function isUpPressed() {
-		if (Key.isDown(keyUp)) {
-			trace(Std.string(keyUp) + "is pressed");
-			return true;
-		}
-		return false;
+		return Key.isDown(keyUp);
 	}
 
 	public function isDownPressed() {
-		if (Key.isDown(keyDown)) {
-			trace(Std.string(keyDown) + "is pressed");
-			return true;
-		}
-		return false;
+		return Key.isDown(keyDown);
 	}
 }
 
@@ -168,12 +165,17 @@ class Main extends hxd.App {
 		for(paddle in paddles) {
 			var paddleBounds = h2d.col.Bounds.fromValues(paddle.x - paddle.width / 2, paddle.y - paddle.height / 2, paddle.width, paddle.height);
 			if (ballCircle.collideBounds(paddleBounds)) {
+				var modification = (ball.y - paddle.y) / (paddle.height / 2);
 				if(ball.normalSpeed.x < 0){
 					ball.setPosition(paddle.x + paddle.width / 2 + ball.radius, ball.y);
 				}else{
 					ball.setPosition(paddle.x - paddle.width / 2 - ball.radius, ball.y);
 				}
+				ball.normalSpeed.y = modification + ball.normalSpeed.y;
 				ball.normalSpeed.x = -ball.normalSpeed.x;
+				var long = Math.sqrt(ball.normalSpeed.x * ball.normalSpeed.x + ball.normalSpeed.y * ball.normalSpeed.y);
+				ball.normalSpeed.x /= long;
+				ball.normalSpeed.y /= long;
 				ball.speed += ball.acceleration;
 			}
 		}
